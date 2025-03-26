@@ -10,6 +10,8 @@ import Poll from "./components/Poll";
 import Home from "./components/Home";
 import "./App.css";
 import Payment from "./components/Payment";
+import PaymentSuccess from "./components/PaymentSuccess";
+import PaymentFailure from "./components/PaymentFailure";
 
 function App() {
   return (
@@ -23,7 +25,9 @@ function App() {
         <Route path="/video-call" element={<VideoCall />} />
         <Route path="/breakout-room" element={<BreakoutRoom />} />
         <Route path="/poll" element={<Poll />} />
-        <Route path="/payment" element={<Payment />} />
+        <Route path="/payment/:roomId" element={<Payment />} />
+        <Route path="/payment-success" element={<PaymentSuccess />} />
+        <Route path="/payment-failure" element={<PaymentFailure />} />
       </Routes>
     </Router>
   );

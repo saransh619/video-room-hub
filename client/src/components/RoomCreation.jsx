@@ -9,11 +9,21 @@ const RoomCreation = () => {
 
   const handleCreateRoom = async () => {
     try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/login");
+        return;
+      }
       const response = await axios.post(
         "http://localhost:5000/api/rooms/create",
         {
           maxUsers,
           pricePerUser,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
       alert(`Room created with ID: ${response.data.roomId}`);

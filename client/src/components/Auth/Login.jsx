@@ -20,8 +20,8 @@ const Login = () => {
         }
       );
 
-      // Save the token in localStorage
       localStorage.setItem("token", response.data.token);
+      localStorage.setItem("user", JSON.stringify(response.data.user));
 
       // Redirect to the home page or dashboard
       navigate("/create-room");
