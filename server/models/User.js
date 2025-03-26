@@ -5,7 +5,6 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role: { type: String, enum: ["user", "admin"], default: "user" },
-  paymentStatus: { type: String, enum: ["paid", "unpaid"], default: "unpaid" },
   currentRoom: { type: mongoose.Schema.Types.ObjectId, ref: "Room" },
   currentBreakoutRoom: {
     type: mongoose.Schema.Types.ObjectId,

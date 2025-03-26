@@ -7,6 +7,9 @@ const router = express.Router();
 // Create a room
 router.post("/create", authUser, roomController.createRoom);
 
+// Get room details
+router.get("/:roomId", authUser, roomController.getRoomDetails);
+
 // Join a room
 router.post("/:roomId/join", authUser, roomController.joinRoom);
 
@@ -18,5 +21,12 @@ router.get("/:roomId/link", authUser, roomController.generateRoomLink);
 
 // Admin can close a room
 router.post("/close/:roomId", authAdmin, roomController.closeRoom);
+
+// Validate room link
+router.get(
+  "/validate-link/:roomLink",
+  authUser,
+  roomController.validateRoomLink
+);
 
 module.exports = router;

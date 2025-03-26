@@ -137,6 +137,17 @@ const handleWebRTCIceCandidate = (socket, io) => (data) => {
   socket.to(roomId).emit("ice-candidate-received", { candidate, senderId });
 };
 
+// Heartbeat handler
+const handleUserHeartbeat = (socket, io) => async (userId) => {
+  try {
+    await User.findByIdAndUpdate(userId, {
+      lastActive: new Date(),
+    });
+  } catch (error) {
+    console.error("Heartbeat error:", error);
+  }
+};
+
 // Disconnect handler
 const handleUserDisconnect = (socket, io) => {
   console.log("Client disconnected");

@@ -55,6 +55,62 @@ exports.createBreakoutRoom = async (req, res) => {
   }
 };
 
+exports.startBreakoutTimer = async (req, res) => {
+  const { breakoutRoomId } = req.params;
+
+  try {
+    const breakoutRoom = await BreakoutRoom.findById(breakoutRoomId);
+    if (!breakoutRoom) {
+      return res.status(404).json({ error: "Breakout room not found" });
+    }
+
+    // Don't allow restarting if already active or completed
+    if (breakoutRoom.status !== "pending") {
+      return res.status(400).json({
+        error: "Breakout room timer can only be started from pending status",
+      });
+    }
+
+    // Update startedAt and status
+    breakoutRoom.startedAt = new Date();
+    breakoutRoom.status = "active";
+    await breakoutRoom.save();
+
+    // Set timeout to automatically end after 2 minutes
+    setTimeout(async () => {
+      try {
+        const updatedRoom = await BreakoutRoom.findById(breakoutRoomId);
+        if (updatedRoom && updatedRoom.status === "active") {
+          updatedRoom.status = "completed";
+          updatedRoom.endedAt = new Date();
+          await updatedRoom.save();
+
+          // Update all users' status back to "in-room"
+          await User.updateMany(
+            { _id: { $in: updatedRoom.users } },
+            { status: "in-room" }
+          );
+
+          // Notify users to return to main room
+          req.io.to(breakoutRoomId).emit("breakout-time-expired", {
+            breakoutRoomId,
+            mainRoomId: updatedRoom.roomId,
+          });
+        }
+      } catch (error) {
+        console.error("Error in breakout timer expiration:", error);
+      }
+    }, 120000); // 2 minutes
+
+    res.status(200).json({
+      message: "Breakout timer started",
+      expiresAt: new Date(Date.now() + 120000),
+    });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
 exports.joinBreakoutRoom = async (req, res) => {
   const { breakoutRoomId } = req.params;
   const { userId } = req.body;

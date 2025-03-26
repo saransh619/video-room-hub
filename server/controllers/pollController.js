@@ -1,17 +1,28 @@
 const Poll = require("../models/Poll");
 
 exports.createPoll = async (req, res) => {
-  const { question, options, breakoutRoomId } = req.body;
+  const { questions, breakoutRoomId } = req.body;
 
-  // Validate input
-  if (!question || !options || options.length !== 4 || !breakoutRoomId) {
-    return res.status(400).json({ error: "Invalid input" });
+  // Validate exactly 5 questions
+  if (!questions || questions.length !== 5) {
+    return res.status(400).json({
+      error: "Exactly 5 questions are required",
+    });
   }
 
   try {
-    const poll = new Poll({ question, options, breakoutRoomId });
-    await poll.save();
-    res.status(201).json({ pollId: poll._id });
+    const polls = await Promise.all(
+      questions.map(async (questionData) => {
+        const poll = new Poll({
+          ...questionData,
+          breakoutRoomId,
+        });
+        await poll.save();
+        return poll;
+      })
+    );
+
+    res.status(201).json({ polls });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

@@ -11,6 +11,7 @@ const paymentSchema = new mongoose.Schema({
   },
   paymentId: { type: String },
   paymentGateway: { type: String, required: true },
+  paymentUrl: String,
   gatewayResponse: { type: Object },
   retryCount: {
     type: Number,

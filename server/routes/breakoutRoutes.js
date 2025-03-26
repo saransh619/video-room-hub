@@ -7,6 +7,13 @@ const router = express.Router();
 // Create breakout room (admin only)
 router.post("/create", authAdmin, breakoutController.createBreakoutRoom);
 
+// Start breakout room timer (admin only)
+router.post(
+  "/:breakoutRoomId/start-timer",
+  authAdmin,
+  breakoutController.startBreakoutTimer
+);
+
 // Join breakout room
 router.post(
   "/:breakoutRoomId/join",

@@ -1,14 +1,21 @@
 const jwt = require("jsonwebtoken");
 
 const authUser = (req, res, next) => {
-  const token = req.header("Authorization")?.replace("Bearer ", "");
-  if (!token) {
+  const authHeader = req.headers["authorization"];
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(401).json({ error: "Access denied. No token provided." });
+  }
+  const jwtToken = authHeader.split(" ")[1]?.trim();
+
+  if (!jwtToken) {
+    return res
+      .status(401)
+      .json({ error: "Access denied. Invalid token format." });
   }
 
   try {
-    console.log("process.env.JWT_SECRET", process.env.JWT_SECRET);
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
     req.user = decoded;
     next();
   } catch (error) {
@@ -17,13 +24,14 @@ const authUser = (req, res, next) => {
 };
 
 const authAdmin = (req, res, next) => {
-  const token = req.header("Authorization")?.replace("Bearer ", "");
-  if (!token) {
+  const token = req.header("Authorization");
+  if (!token || !token.startsWith("Bearer ")) {
     return res.status(401).json({ error: "Access denied. No token provided." });
   }
+  const jwtToken = token.split(" ")[1];
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
     if (decoded.role !== "admin") {
       return res
         .status(403)

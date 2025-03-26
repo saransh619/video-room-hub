@@ -1,9 +1,12 @@
 const Room = require("../models/Room");
+const User = require("../models/User");
+const Payment = require("../models/Payment");
 const mongoose = require("mongoose");
 const { v4: uuidv4 } = require("uuid");
 
 const createRoom = async (req, res) => {
-  const { maxUsers, pricePerUser, creator } = req.body;
+  const { maxUsers, pricePerUser } = req.body;
+  const creator = req.user.userId;
 
   // Validate input
   if (!maxUsers || !pricePerUser || !creator) {
@@ -20,40 +23,108 @@ const createRoom = async (req, res) => {
   }
 };
 
-const joinRoom = async (req, res) => {
-  const { roomId } = req.params;
-  const { userId } = req.body;
-
+const getRoomDetails = async (req, res) => {
   try {
-    const room = await Room.findById(roomId);
+    const room = await Room.findById(req.params.roomId).populate(
+      "creator",
+      "username"
+    );
+
     if (!room) {
       return res.status(404).json({ error: "Room not found" });
     }
 
-    // Check if the room is full
+    res.json({
+      id: room._id,
+      maxUsers: room.maxUsers,
+      pricePerUser: room.pricePerUser,
+      currentUsers: room.users.length,
+      creator: room.creator,
+      status: room.status,
+    });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+const joinRoom = async (req, res) => {
+  try {
+    const { roomId } = req.params;
+    const userId = req.user.userId;
+
+    console.log(`Join room attempt - User: ${userId}, Room: ${roomId}`);
+
+    // Fetch room, payment, and user in parallel
+    const [room, validPayment, user] = await Promise.all([
+      Room.findById(roomId),
+      Payment.findOne({
+        userId,
+        roomId,
+        status: "paid",
+        expiresAt: { $gt: new Date() },
+      }),
+      User.findById(userId),
+    ]);
+
+    if (!room) {
+      return res.status(404).json({ error: "Room not found" });
+    }
+
+    // Check room capacity
     if (room.currentUsers >= room.maxUsers) {
       return res.status(400).json({ error: "Room is full" });
     }
 
-    // Check if the user has paid (assuming payment status is stored in the User model)
-    const user = await User.findById(userId);
-    if (!user || user.paymentStatus !== "paid") {
-      return res
-        .status(400)
-        .json({ error: "Payment required to join the room" });
+    // Verify payment
+    if (!validPayment) {
+      return res.status(400).json({
+        error: "Valid payment required",
+        details: "No active payment found for this room",
+      });
     }
 
-    // Add user to the room
+    // Check for duplicate join
+    if (room.users.includes(userId)) {
+      return res.status(200).json({
+        message: "User already in room",
+        warning: "Duplicate join attempt prevented",
+        currentUsers: room.currentUsers,
+      });
+    }
+
+    // Update room
     room.users.push(userId);
     room.currentUsers += 1;
-    if (room.currentUsers >= room.maxUsers) {
-      room.status = "full";
-    }
+    if (room.currentUsers >= room.maxUsers) room.status = "full";
     await room.save();
 
-    res.status(200).json({ message: "Joined room successfully" });
+    // Update user
+    await User.findByIdAndUpdate(userId, {
+      currentRoom: roomId,
+      status: "in-room",
+      updatedAt: new Date(),
+    });
+
+    // Emit socket event
+    req.io.to(roomId).emit("user-joined", {
+      userId,
+      username: user.username,
+      currentUsers: room.currentUsers,
+      roomStatus: room.status,
+    });
+
+    res.status(200).json({
+      message: "Joined room successfully",
+      roomStatus: room.status,
+      currentUsers: room.currentUsers,
+      isAdmin: room.creator.toString() === userId,
+    });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    console.error("Join room error:", error.message);
+    res.status(400).json({
+      error: "Failed to join room",
+      details: error.message,
+    });
   }
 };
 
@@ -109,10 +180,31 @@ const closeRoom = async (req, res) => {
   }
 };
 
+const validateRoomLink = async (req, res) => {
+  const { roomLink } = req.params;
+  try {
+    const room = await Room.findOne({ roomLink });
+    if (!room) {
+      return res.status(404).json({ valid: false, error: "Room not found" });
+    }
+    res.status(200).json({
+      valid: true,
+      roomId: room._id,
+      maxUsers: room.maxUsers,
+      currentUsers: room.currentUsers,
+      pricePerUser: room.pricePerUser,
+    });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
 module.exports = {
   createRoom,
+  getRoomDetails,
   joinRoom,
   getRoomUsers,
   generateRoomLink,
   closeRoom,
+  validateRoomLink,
 };
