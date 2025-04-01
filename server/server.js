@@ -8,19 +8,46 @@ const pollRoutes = require("./routes/pollRoutes");
 const userRoutes = require("./routes/userRoutes");
 const authRoutes = require("./routes/authRoutes");
 const socketHandler = require("./socket/socketHandler");
+const tokenRoutes = require("./routes/tokenRoutes");
 
-const http = require("http");
+const https = require("https");
 const socketIo = require("socket.io");
+const fs = require("fs");
 
 const dotenv = require("dotenv");
 dotenv.config();
 
 const app = express();
-const server = http.createServer(app);
+
+// Load SSL certificate and key
+const httpsOptions = {
+  key: fs.readFileSync("./certs/key.pem"),
+  cert: fs.readFileSync("./certs/cert.pem"),
+};
+
+const server = https.createServer(httpsOptions, app);
+
+// Allow specific origins
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:5173",
+  "http://192.168.1.68:5173",
+  "https://localhost:5173",
+  "https://192.168.1.68:5173",
+];
+
+// Socket.IO CORS configuration
 const io = socketIo(server, {
   cors: {
-    origin: process.env.CLIENT_URL || "*",
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     methods: ["GET", "POST"],
+    credentials: true,
   },
 });
 
@@ -30,7 +57,6 @@ const PORT = process.env.PORT || 5000;
 connectDB();
 
 // Middleware
-const allowedOrigins = ["http://localhost:3000", "http://localhost:5173"];
 const corsOptions = {
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
@@ -61,9 +87,17 @@ app.use("/api/payments", paymentRoutes);
 app.use("/api/breakout", breakoutRoutes);
 app.use("/api/polls", pollRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api", tokenRoutes);
 
 // Initialize WebRTC Signaling and Socket Events
 socketHandler(io);
+
+// Log Socket.IO connections
+io.on("connection", (socket) => {
+  console.log(
+    `New Socket.IO connection: ${socket.id}, userId: ${socket.handshake.auth.userId}`
+  );
+});
 
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

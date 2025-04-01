@@ -1,0 +1,136 @@
+/* Room Joining Container */
+.room-joining {
+    width: 100%;
+    max-width: 500px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #1a1a1a;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Heading */
+  .room-joining h1 {
+    font-size: 3rem;
+    font-weight: 500;
+    color: #ffffff;
+    margin-bottom: 30px;
+    text-align: center;
+  }
+  
+  /* Input Field */
+  .room-joining input {
+    width: 100%;
+    max-width: 400px;
+    padding: 15px 20px;
+    margin: 15px 0;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #2a2a2a;
+    color: #ffffff;
+    font-size: 1.2rem;
+    font-family: inherit;
+    transition: border-color 0.3s ease;
+  }
+  
+  .room-joining input::placeholder {
+    color: #aaa;
+  }
+  
+  .room-joining input:focus {
+    border-color: #646cff;
+    outline: none;
+  }
+  
+  .room-joining input:disabled {
+    background-color: #3a3a3a;
+    cursor: not-allowed;
+  }
+  
+  /* Room Info Section */
+  .room-joining .room-info {
+    width: 100%;
+    max-width: 400px;
+    margin-top: 15px;
+    padding: 15px;
+    background-color: #2a2a2a;
+    border-radius: 8px;
+    text-align: center;
+  }
+  
+  .room-joining .room-info p {
+    color: #ffffff;
+    font-size: 1.1rem;
+    margin: 5px 0;
+  }
+  
+  /* Message */
+  .room-joining > p {
+    color: #aaa;
+    font-size: 1.1rem;
+    margin-top: 15px;
+    text-align: center;
+  }
+  
+  /* Button */
+  .room-joining button {
+    width: 100%;
+    max-width: 400px;
+    padding: 15px 20px;
+    margin-top: 15px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background-color: #4CAF50;
+    color: #ffffff;
+    font-size: 1.2rem;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+  }
+  
+  .room-joining button:hover {
+    background-color: #45a049;
+    border-color: #4CAF50;
+  }
+  
+  .room-joining button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+  
+  .room-joining button:focus,
+  .room-joining button:focus-visible {
+    outline: 4px auto -webkit-focus-ring-color;
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 480px) {
+    .room-joining {
+      padding: 20px;
+    }
+  
+    .room-joining h1 {
+      font-size: 2.5rem;
+    }
+  
+    .room-joining input,
+    .room-joining .room-info,
+    .room-joining button {
+      max-width: 300px;
+      padding: 12px 15px;
+    }
+  
+    .room-joining input,
+    .room-joining .room-info p,
+    .room-joining button {
+      font-size: 1rem;
+    }
+  
+    .room-joining > p {
+      font-size: 0.9rem;
+    }
+  }

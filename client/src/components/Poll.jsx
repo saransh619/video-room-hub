@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import BASE_URL from "../utils/config";
 
 const Poll = () => {
   const [pollId, setPollId] = useState("");
@@ -7,14 +8,11 @@ const Poll = () => {
 
   const handleCreatePoll = async () => {
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/polls/create",
-        {
-          question: "What is your favorite color?",
-          options: ["Red", "Blue", "Green", "Yellow"],
-          breakoutRoomId: "breakout-room-id", // Replace with actual breakout room ID
-        }
-      );
+      const response = await axios.post(`${BASE_URL}/api/polls/create`, {
+        question: "What is your favorite color?",
+        options: ["Red", "Blue", "Green", "Yellow"],
+        breakoutRoomId: "breakout-room-id", // Replace with actual breakout room ID
+      });
       setPollId(response.data.pollId);
       alert(`Poll created with ID: ${response.data.pollId}`);
     } catch (error) {
@@ -28,7 +26,7 @@ const Poll = () => {
       return;
     }
     try {
-      await axios.post("http://localhost:5000/api/polls/cast-vote", {
+      await axios.post(`${BASE_URL}/api/polls/cast-vote`, {
         pollId,
         optionIndex: selectedOption,
       });

@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import BASE_URL from "../utils/config";
 
 export default function PaymentSuccess() {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ export default function PaymentSuccess() {
   useEffect(() => {
     const verifyPayment = async () => {
       if (hasJoined.current) return; // Skip if already joined
+      let params;
       try {
         const token = localStorage.getItem("token");
         const userData = JSON.parse(localStorage.getItem("user"));
@@ -26,7 +28,7 @@ export default function PaymentSuccess() {
         // Fix malformed URL by replacing ? with & for second parameter
         const fixedUrl = fullUrl.replace(/(\?roomId=.*?)\?/, "$1&");
         const urlObj = new URL(fixedUrl);
-        const params = new URLSearchParams(urlObj.search);
+        params = new URLSearchParams(urlObj.search);
 
         // Get parameters
         const pidx = params.get("pidx");
@@ -35,7 +37,7 @@ export default function PaymentSuccess() {
 
         // Verify payment
         const { data: verification } = await axios.post(
-          "http://localhost:5000/api/payments/verify",
+          `${BASE_URL}/api/payments/verify`,
           { pidx, roomId },
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -47,7 +49,7 @@ export default function PaymentSuccess() {
         // Join room
         if (!hasJoined.current) {
           await axios.post(
-            `http://localhost:5000/api/rooms/${roomId}/join`,
+            `${BASE_URL}/api/rooms/${roomId}/join`,
             {},
             { headers: { Authorization: `Bearer ${token}` } }
           );
@@ -56,16 +58,16 @@ export default function PaymentSuccess() {
 
         // Get updated room details
         const { data: updatedRoom } = await axios.get(
-          `http://localhost:5000/api/rooms/${roomId}`,
+          `${BASE_URL}/api/rooms/${roomId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        // Redirect to video call
-        navigate(
-          `/video-call?roomId=${roomId}&isAdmin=${
-            updatedRoom.creator._id === currentUserId
-          }`
-        );
+        navigate("/video-call", {
+          state: {
+            roomId,
+            isAdmin: updatedRoom.creator._id === currentUserId,
+          },
+        });
       } catch (error) {
         console.error("Payment error:", error);
         navigate("/payment-failure", {

@@ -10,6 +10,9 @@ router.post("/create", authUser, roomController.createRoom);
 // Get room details
 router.get("/:roomId", authUser, roomController.getRoomDetails);
 
+// Check user status for a room
+router.get("/:roomId/check-status", authUser, roomController.checkStatus);
+
 // Join a room
 router.post("/:roomId/join", authUser, roomController.joinRoom);
 
@@ -21,6 +24,16 @@ router.get("/:roomId/link", authUser, roomController.generateRoomLink);
 
 // Admin can close a room
 router.post("/close/:roomId", authAdmin, roomController.closeRoom);
+
+// User can leave a room
+router.post("/:roomId/leave", authUser, roomController.leaveRoom);
+
+// Admin can remove a user from a room
+router.post(
+  "/:roomId/remove-user/:userId",
+  authAdmin,
+  roomController.removeUserFromRoom
+);
 
 // Validate room link
 router.get(

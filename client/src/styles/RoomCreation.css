@@ -1,0 +1,180 @@
+/* Room Creation Container */
+.room-creation {
+    width: 100%;
+    max-width: 500px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #1a1a1a;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Heading */
+  .room-creation h1 {
+    font-size: 3rem;
+    font-weight: 500;
+    color: #ffffff;
+    margin-bottom: 30px;
+    text-align: center;
+  }
+  
+  /* Input Fields */
+  .room-creation input {
+    width: 100%;
+    max-width: 400px;
+    padding: 15px 20px;
+    margin: 15px 0;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #2a2a2a;
+    color: #ffffff;
+    font-size: 1.2rem;
+    font-family: inherit;
+    transition: border-color 0.3s ease;
+  }
+  
+  .room-creation input::placeholder {
+    color: #aaa;
+  }
+  
+  .room-creation input:focus {
+    border-color: #646cff;
+    outline: none;
+  }
+  
+  /* Button */
+  .room-creation button {
+    width: 100%;
+    max-width: 400px;
+    padding: 15px 20px;
+    margin-top: 15px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background-color: #646cff;
+    color: #ffffff;
+    font-size: 1.2rem;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+  }
+  
+  .room-creation button:hover {
+    background-color: #535bf2;
+    border-color: #646cff;
+  }
+  
+  .room-creation button:focus,
+  .room-creation button:focus-visible {
+    outline: 4px auto -webkit-focus-ring-color;
+  }
+  
+  /* Room Created Section */
+  .room-creation .room-created {
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+  }
+  
+  .room-creation .room-created p {
+    color: #ffffff;
+    font-size: 1.2rem;
+    margin: 10px 0;
+  }
+  
+  .room-creation .room-created .room-id {
+    font-weight: bold;
+    color: #646cff; 
+  }
+  
+  .room-creation .room-created a {
+    color: #646cff;
+    text-decoration: underline;
+    word-break: break-all; 
+  }
+  
+  .room-creation .room-created a:hover {
+    color: #535bf2;
+  }
+  
+  /* Copy Button */
+  .room-creation .copy-button {
+    background-color: #4CAF50; 
+  }
+  
+  .room-creation .copy-button:hover {
+    background-color: #45a049;
+    border-color: #4CAF50;
+  }
+  
+  /* Go to Room Button */
+  .room-creation .go-to-room-button {
+    background-color: #2196F3; 
+  }
+  
+  .room-creation .go-to-room-button:hover {
+    background-color: #1e88e5;
+    border-color: #2196F3;
+  }
+  
+  /* Notification */
+  .room-creation .notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 24px;
+    border-radius: 8px;
+    background-color: #4CAF50;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    animation: slide-in 0.3s ease, fade-out 0.5s ease 2.5s forwards;
+  }
+  
+  @keyframes slide-in {
+    from {
+      top: -50px;
+      opacity: 0;
+    }
+    to {
+      top: 20px;
+      opacity: 1;
+    }
+  }
+  
+  @keyframes fade-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+      visibility: hidden;
+    }
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 480px) {
+    .room-creation {
+      padding: 20px;
+    }
+  
+    .room-creation h1 {
+      font-size: 2.5rem;
+    }
+  
+    .room-creation input,
+    .room-creation button,
+    .room-creation .room-created {
+      max-width: 300px;
+      padding: 12px 15px;
+      font-size: 1rem;
+    }
+  
+    .room-creation .room-created p {
+      font-size: 1rem;
+    }
+  }

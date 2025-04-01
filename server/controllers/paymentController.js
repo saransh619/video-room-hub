@@ -10,6 +10,10 @@ exports.initiatePayment = async (req, res) => {
     const room = await Room.findById(roomId);
     if (!room) return res.status(404).json({ error: "Room not found" });
 
+    if (room.users.some((u) => u.toString() === userId)) {
+      return res.status(200).json({ message: "User already in room" });
+    }
+
     // Check for existing pending payment
     const existingPayment = await Payment.findOne({
       userId,
@@ -27,28 +31,25 @@ exports.initiatePayment = async (req, res) => {
 
     const paymentGateway = new PaymentGateway(provider);
     const paymentData = {
-      amount: room.pricePerUser, // Store in NPR
+      amount: room.pricePerUser,
       userId,
       roomId,
       returnUrl: `${process.env.PAYMENT_SUCCESS_URL}?roomId=${roomId}`,
       failureUrl: `${process.env.PAYMENT_FAILURE_URL}?roomId=${roomId}`,
     };
-    // console.log("payment data", paymentData);
 
     const paymentResponse = await paymentGateway.initiatePayment(paymentData);
-    // console.log("payment response", paymentResponse);
 
     // Save payment record
     const payment = new Payment({
       userId,
       roomId,
-      amount: room.pricePerUser, // Store in NPR
+      amount: room.pricePerUser,
       paymentId: paymentResponse.pidx || paymentResponse.transaction_uuid,
       paymentGateway: provider,
       paymentUrl: paymentResponse.payment_url,
       status: "pending",
     });
-    // console.log("payment from controller", payment);
     await payment.save();
 
     res.json({
@@ -62,8 +63,6 @@ exports.initiatePayment = async (req, res) => {
 
 exports.verifyPayment = async (req, res) => {
   const { pidx, roomId } = req.body;
-  // console.log("Verification request:", { pidx, roomId });
-
   try {
     if (!pidx) {
       return res.status(400).json({ error: "Missing payment ID" });
@@ -72,8 +71,6 @@ exports.verifyPayment = async (req, res) => {
     // Verify with Khalti
     const paymentGateway = new PaymentGateway("khalti");
     const verification = await paymentGateway.verifyPayment(pidx);
-
-    // console.log("Verification result:", verification);
 
     // Update payment record
     const payment = await Payment.findOneAndUpdate(

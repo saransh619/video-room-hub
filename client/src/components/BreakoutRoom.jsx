@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+import BASE_URL from "../utils/config";
 
 const BreakoutRoom = () => {
   const [breakoutRoomId, setBreakoutRoomId] = useState("");
@@ -19,7 +20,7 @@ const BreakoutRoom = () => {
     const fetchUsers = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/rooms/${roomId}/users`
+          `${BASE_URL}/api/rooms/${roomId}/users`
         );
         setUsers(response.data.users);
       } catch (error) {
@@ -37,13 +38,10 @@ const BreakoutRoom = () => {
     }
 
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/breakout/create",
-        {
-          roomId,
-          users: users.map((user) => user._id),
-        }
-      );
+      const response = await axios.post(`${BASE_URL}/api/breakout/create`, {
+        roomId,
+        users: users.map((user) => user._id),
+      });
       setBreakoutRoomId(response.data.breakoutRoomId);
       alert(`Breakout room created with ID: ${response.data.breakoutRoomId}`);
     } catch (error) {

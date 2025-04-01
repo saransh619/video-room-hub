@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import BASE_URL from "../../utils/config";
+import "../../styles/Signup.css";
 
 const Signup = () => {
   const [username, setUsername] = useState("");
@@ -14,15 +16,12 @@ const Signup = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/signup",
-        {
-          username,
-          email,
-          password,
-          role,
-        }
-      );
+      const response = await axios.post(`${BASE_URL}/api/auth/signup`, {
+        username,
+        email,
+        password,
+        role,
+      });
 
       // Save the token in localStorage
       localStorage.setItem("token", response.data.token);

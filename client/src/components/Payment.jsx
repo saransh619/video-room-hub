@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
+import BASE_URL from "../utils/config";
+import "../styles/Payment.css";
 
 const Payment = () => {
   const [provider, setProvider] = useState("esewa");
@@ -18,7 +20,7 @@ const Payment = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        "http://localhost:5000/api/payments/initiate",
+        `${BASE_URL}/api/payments/initiate`,
         { roomId, provider },
         { headers: { Authorization: `Bearer ${token}` } }
       );
