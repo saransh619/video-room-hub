@@ -4,7 +4,7 @@ const bcrypt = require("bcryptjs");
 
 // Signup
 exports.signup = async (req, res) => {
-  const { username, email, password, role } = req.body;
+  const { fullname, username, email, password } = req.body;
 
   try {
     const existingUser = await User.findOne({ email });
@@ -15,22 +15,19 @@ exports.signup = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = new User({
+      fullname,
       username,
       email,
       password: hashedPassword,
-      role: role || "user",
+      // role: role || "user",
     });
 
     await user.save();
 
     // Generate a JWT token
-    const token = jwt.sign(
-      { userId: user._id, role: user.role },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "1h",
-      }
-    );
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
 
     res.status(201).json({
       message: "User registered successfully",
@@ -59,7 +56,7 @@ exports.login = async (req, res) => {
 
     // Generate a JWT token
     const token = jwt.sign(
-      { userId: user._id.toString(), role: user.role },
+      { userId: user._id.toString() },
       process.env.JWT_SECRET,
       {
         expiresIn: "1h",
@@ -71,9 +68,10 @@ exports.login = async (req, res) => {
       token,
       user: {
         userId: user._id,
+        fullname: user.fullname,
         username: user.username,
         email: user.email,
-        role: user.role,
+        // role: user.role,
       },
     });
   } catch (error) {

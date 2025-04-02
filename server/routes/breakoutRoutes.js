@@ -38,14 +38,14 @@ router.get(
 // End breakout room (admin only)
 router.post(
   "/:breakoutRoomId/end",
-  authAdmin,
+  // authAdmin,
   breakoutController.endBreakoutRoom
 );
 
 // Check if user is in a breakout room
 router.get(
   "/check-status",
-  authUser,
+  // authUser,
   breakoutController.checkUserBreakoutStatus
 );
 

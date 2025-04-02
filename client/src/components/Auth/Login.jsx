@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import BASE_URL from "../../utils/config";
 import "../../styles/Login.css";
 
@@ -8,10 +8,13 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError("");
 
     try {
       const response = await axios.post(`${BASE_URL}/api/auth/login`, {
@@ -21,13 +24,18 @@ const Login = () => {
 
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("user", JSON.stringify(response.data.user));
-
-      // Redirect to the home page or dashboard
       navigate("/create-room");
     } catch (error) {
       setError("Invalid email or password");
       console.error("Login error:", error);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const handleInputChange = (setter) => (e) => {
+    setError("");
+    setter(e.target.value);
   };
 
   return (
@@ -35,24 +43,34 @@ const Login = () => {
       <h1>Login</h1>
       {error && <p className="error">{error}</p>}
       <form onSubmit={handleLogin}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button type="submit">Login</button>
+        <div>
+          <label htmlFor="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={handleInputChange(setEmail)}
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            placeholder="Enter your password"
+            value={password}
+            onChange={handleInputChange(setPassword)}
+            required
+          />
+        </div>
+        <button type="submit" disabled={loading}>
+          {loading ? "Logging In..." : "Login"}
+        </button>
       </form>
       <p>
-        Don't have an account? <a href="/signup">Sign up</a>
+        Don't have an account? <Link to="/signup">Sign up</Link>{" "}
       </p>
     </div>
   );
