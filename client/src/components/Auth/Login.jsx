@@ -24,7 +24,7 @@ const Login = () => {
 
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("user", JSON.stringify(response.data.user));
-      navigate("/create-room");
+      navigate("/"); // navigate to home page
     } catch (error) {
       setError("Invalid email or password");
       console.error("Login error:", error);

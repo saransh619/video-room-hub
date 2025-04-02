@@ -4,7 +4,7 @@ import BASE_URL from "./config";
 // Socket.IO client configuration
 const userData = JSON.parse(localStorage.getItem("user"));
 const userId = userData?.userId;
-console.log("User ID in socket.js:", userId);
+// console.log("User ID in socket.js:", userId);
 
 const socket = io(BASE_URL, {
   auth: {
@@ -16,7 +16,7 @@ const socket = io(BASE_URL, {
 
 // Log connection events
 socket.on("connect", () => {
-  console.log("Socket.IO connected:", socket.id);
+  // console.log("Socket.IO connected:", socket.id);
 });
 
 socket.on("connect_error", (error) => {

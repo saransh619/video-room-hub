@@ -199,13 +199,13 @@ const VideoCall = () => {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        console.log("leaveRoom response:", response.data); // Log the response for debugging
+        // console.log("leaveRoom response:", response.data);
       } catch (apiError) {
         console.error(
           "Error calling leaveRoom endpoint:",
           apiError.response?.data || apiError.message
         );
-        throw apiError; // Re-throw the error to handle it in the outer catch block
+        throw apiError;
       }
 
       // Emit user-left socket event
@@ -224,7 +224,6 @@ const VideoCall = () => {
       navigate("/call-ended", { state: { roomId } });
     } catch (error) {
       console.error("Error during endCall cleanup:", error);
-      // Optionally, show an error message to the user
       setNotification({
         message: "Failed to properly end the call. Please try again.",
         persistent: true,

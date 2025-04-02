@@ -48,7 +48,7 @@ const RoomJoining = () => {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        console.log("User status:", statusResponse.data);
+        // console.log("User status:", statusResponse.data);
         setUserStatus({
           ...statusResponse.data,
           isAdmin: roomResponse.data.creator._id === currentUserId,
@@ -80,7 +80,7 @@ const RoomJoining = () => {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        console.log("Join response:", joinResponse.data);
+        // console.log("Join response:", joinResponse.data);
         navigate("/video-call", {
           state: { roomId: idToJoin, isAdmin: userStatus.isAdmin },
         });

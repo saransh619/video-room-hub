@@ -372,8 +372,6 @@ const leaveRoom = async (req, res) => {
       { new: true }
     );
 
-    console.log(`Updated room ${roomId}:`, updatedRoom); // Debug log
-
     // Update user
     const updatedUser = await User.findByIdAndUpdate(
       userId,
@@ -383,8 +381,6 @@ const leaveRoom = async (req, res) => {
       },
       { new: true }
     );
-
-    console.log(`Updated user ${userId}:`, updatedUser); // Debug log
 
     // Emit socket events
     req.io.to(roomId).emit("user-left", {
